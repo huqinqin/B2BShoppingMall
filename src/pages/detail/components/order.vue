@@ -2,8 +2,7 @@
    <div>我是订单</div>
 </template>
 
-<style scoped>
-
+<style lang="less">
 </style>
 
 <script>

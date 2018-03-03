@@ -3,6 +3,7 @@ const path = require('path')
 const config = require('../config')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const packageConfig = require('../package.json')
+const glob = require('glob')
 
 exports.assetsPath = function (_path) {
   const assetsSubDirectory = process.env.NODE_ENV === 'production'
@@ -98,4 +99,24 @@ exports.createNotifierCallback = () => {
       icon: path.join(__dirname, 'logo.png')
     })
   }
+}
+
+exports.getEntries = function (globPath) {
+  //globPath 为 ./src/pages/**/**.js
+  let entries = {};
+  glob.sync(globPath).forEach((filePath) => {
+    if(filePath.indexOf('components') > -1 || filePath.indexOf('router') > -1)  {
+       return;
+    }
+    /*获取该目录下所有的js文件的名字，例如account.js,得到的结果是account*/
+    let basename = path.basename(filePath,path.extname(filePath));
+    /*htmlPage的值是'account/index','index/index','detail/index*/
+    /*filePath.split('/')的结果为[.,src,pages,**,*.js]*/
+    /*slice(3,-1)不包括最后一位*/
+    let htmlPage = filePath.split('/').slice(3,-1).join('/') + basename;
+    if(htmlPage === 'index/index'){
+      entries[htmlPage] = 'index'
+    }
+    entries[htmlPage] = filePath;
+  })
 }
